@@ -1,0 +1,6 @@
+venv
+__pycache__
+app_id.json
+app_secret.json
+app_token.json
+long_token.json
