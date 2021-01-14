@@ -6,47 +6,12 @@ from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 import urllib.request
 import requests
 
+
+###################################################################
+
 ### BASIC SETTING
 URL = "http://localhost:5000"
 
-
-## KEY SETTING
-def get_appid():
-    with open('app_id.json','r') as id:
-        app_id = json.load(id)
-        app_id = app_id['app_id']
-    return app_id
-
-def get_secret():
-    with open('app_secret.json','r') as sec:
-        app_secret = json.load(sec)
-        app_secret = app_secret['app_secret']
-    return app_secret
-
-def set_long_token(token):
-    long_token=dict()
-    long_token['token'] = token
-    with open('long_token.json','w') as t:
-        json.dump(long_token,t)
-
-def set_app_token(token):
-    app_token=dict()
-    app_token['token'] = token
-    with open('app_token.json','w') as t:
-        json.dump(app_token,t)
-
-def get_long_token():
-    with open('long_token.json','r') as long:
-        long_token = json.load(long)
-        long_token = long_token['token']
-    return long_token
-
-def get_app_token():
-    with open('app_token.json','r') as app:
-        app_token = json.load(app)
-        app_token = app_token['token']
-    return app_token
-    
 ## FB OBJECT SETTING
 FB_CLIENT_ID = get_appid()
 FB_CLIENT_SECRET = get_secret()
@@ -60,6 +25,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 app = flask.Flask(__name__)
 
 ###################################################################
+### 사용자가 첫번째로 보는 페이지 - 장기토큰 발급, URL 입력 후 크롤링 개시
 @app.route("/")
 def index():
     return """
@@ -67,7 +33,8 @@ def index():
     <a href="/fb-crawling">Do Crawling </a>
     """
 
-
+####################################################################
+### Facebook session 로그인 후 토큰 교환 
 @app.route("/fb-login")
 def login():
     
@@ -125,13 +92,6 @@ def callback():
     set_app_token(app_token)
     print("app_token: ",app_token)
     
-    
-    # page_request=f"https://graph.facebook.com/v4.0/2371586546315740/posts/?access_token={app_token}"
-    # page_request_get=facebook.get(
-    #      page_request
-    #  ).json()
-    # print(page_request_get)
-
     return f"""
     User information: <br>
     Name: {name} <br>
@@ -141,27 +101,23 @@ def callback():
     <input id="submitbutton" type="submit" name="submitbutton" value="run"/>
 	
     """
-    # @app.route('/fb-longterm')
-    # def getLongToken():
-    #     face
-
+    
 @app.route("/fb-crawling")
 def crawling():
     
-    ##facebook OAuth session setting
-    # facebook = requests_oauthlib.OAuth2Session(
-    #     FB_CLIENT_ID, scope=FB_SCOPE, redirect_uri=URL
-    # )
+    #크롤링 함수 매개변수 
+    # [ page_id(str) , post_type(str), post_text(str), post_shares(int), post_comments(int), post_reaction_total, LIKE,LOVE,...]
+    # page-id -> post_id, post_txt, post_type, total_reactions
 
-    # ## we need to apply a fix for Facebook here
-    # facebook = facebook_compliance_fix(facebook)
+    # post-id ->  shares, post_comments,
+    # 
+    # post - reactions
+    # ?fields=attachments,reactions.summary(total_count)
+    # 124691830975231/posts?fields=comments.summary(total_count),shares,reaction.summary(total_count)
+
     long_token = get_long_token()
-    # page_request=f"https://graph.facebook.com/v4.0/2371586546315740/posts/?access_token={app_token}"
-    # page_request_get=facebook.get(
-    #      page_request
-    #  ).json()
-    # print(page_request_get)
 
+    
     ## 컨텐츠 확인
     data = requests.get(f"https://graph.facebook.com/v4.0/JTBClove/posts/?access_token={long_token}")
     total = requests.get(f"https://graph.facebook.com/v4.0/124691830975231/posts?limit=10&fields=reactions.summary(total_count)")
@@ -174,8 +130,8 @@ def crawling():
         id = data["data"][i]["id"]
         print(total.json()["data"])
 
-        
-
+    
+select_one('#list_subject_7854731 > font.mobile_hide')
         
 
     return """
