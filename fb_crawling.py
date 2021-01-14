@@ -11,8 +11,9 @@ class Facebook_Crawler(object):
         print("token init...")
         self.token = get_long_token()
         self.id = "JTBClove"  # crawled id for testing
-        self.data_list=[]
+        self.data_list = []
     # Creating URL for crawling
+
     def create_URL(self, token, id):
 
         BASE_URL = "https://graph.facebook.com/v4.0/"
@@ -42,7 +43,7 @@ class Facebook_Crawler(object):
             # logging
             print("request_URL : got response", response)
             # from response extract next page
-            ## page 끝에 도달하면 next 없음..!!
+            # page 끝에 도달하면 next 없음..!!
             if 'next' in response.json()['paging']:
                 next_page_link = response.json()['paging']['next']
             else:
@@ -59,14 +60,15 @@ class Facebook_Crawler(object):
 
         page_data_list = []
         page_json['data']
-        
+
         for post in page_json['data']:
             post_created_time = post['created_time']
             # post 없는 경우 예외처리
             if 'title' in post['attachments']['data'][0]:
-                post_title= post['attachments']['data'][0]['title']  # title
+                post_title = post['attachments']['data'][0]['title']  # title
             else:
-                post_title= post['attachments']['data'][0]['description']  # post_title
+                # post_title
+                post_title = post['attachments']['data'][0]['description']
 
             post_type = post['attachments']['data'][0]['type']  # type
             # number of comments
@@ -87,21 +89,24 @@ class Facebook_Crawler(object):
             page_data_list.append(data)
         print(page_data_list)
         return page_data_list
-        
-    ## 페이지에서 얻어온 데이터 리스트를 병합하는 함수
-    def combine_data_list(self,data_list,page_date_list):
+
+    # 페이지에서 얻어온 데이터 리스트를 병합하는 함수
+    def combine_data_list(self, data_list, page_date_list):
         data_list = data_list + page_date_list
         return data_list
 
-    ## 최종적으로 생성된 데이터 리스트에 대해 CSV로 전환해주는 함수
+    # 최종적으로 생성된 데이터 리스트에 대해 CSV로 전환해주는 함수
     def convert_to_csv(self, id, data_list):
-        
+
         with open('./result.csv', 'w', encoding='utf-8-sig', newline='') as f:
              writer = csv.writer(f)
-             writer.writerow(['post_created_time','post_title','post_type','post_shares','post_like','post_love','post_wow','post_haha','post_angry','post_sad','post_angry','post_thankful'])
+             writer.writerow(['post_created_time', 'post_title', 'post_type', 'post_shares', 'post_like',
+                             'post_love', 'post_wow', 'post_haha', 'post_sad', 'post_angry', 'post_thankful'])
              for data in enumerate(data_list):
-                 if(data_list[0]<=100):
-                     writer.writerow(data_list[1])
+                 if(data[0] <= 100):
+                    writer.writerow(data[1])
+        print("ALL DONE")
+                     
         
     
     def start(self):
@@ -109,7 +114,7 @@ class Facebook_Crawler(object):
         URL = self.create_URL(self.token, self.id)
         print("requesting :",URL)
 
-        #처음 페이지에 대해 request
+        # 처음 페이지에 대해 request
         response, next_page_link = self.request_URL(URL)
         print("link : ",next_page_link)
         json_listed = self.parse_json(response)
@@ -117,7 +122,7 @@ class Facebook_Crawler(object):
 
         while True :
             # 다음 페이지 유효성 검사
-            if (next_page_link != None)and(len(data_list)<=30):
+            if (next_page_link != None)and(len(data_list)<=100):
                 print("next..page...")
                 response,next_page_link = self.request_URL(next_page_link)
                 json_listed = self.parse_json(response)
