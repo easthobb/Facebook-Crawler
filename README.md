@@ -1,6 +1,9 @@
 # Facebook-Crawler
 This repository is for Facebook page crawlers. The Facebook crawler is based on Facebook Graph API 4.0. It can be execute by run the Web UI based on flask at a local server. The page URL is entered, crawls on the latest 100 posts on the page, and returns results in CSV (Changeable-post number and paging), which requires API tokens issued by the user directly registering the app, and works when saved as short-term and long-term token json files. Since code for exchanging short-term tokens for long-term tokens is implemented, it is recommended that short-term tokens be exchanged for long-term tokens before being used.
 
+[can see dev seq here]
+https://www.notion.so/hobbeskim/facebook-Crawler-0b584062b2ef4a46acc734d9839f394a
+
 ## Have to Prepare
 
     Facebook App id : app_id.json
