@@ -1,5 +1,5 @@
 # Facebook-Crawler
-이 레포지토리는 페이스북 페이지 크롤러를 위한 레포지토리이다. 이 페이스북 크롤러는 페이스북 Graph API 4.0에 기반한다. 플라스크를 통해 로컬 서버에서 웹 UI를 띄워 동작이 가능하다. 페이지 URL을 입력받아 해당 페이지에 대한 최신 100개 정도의 게시물에 대해 크롤링을 수행하며 CSV로 결과를 반환한다.(변경 가능) 본 크롤러의 동작에는 사용자가 직접 앱 등록을 거쳐 발급받은 API 토큰이 필요하며 단기, 장기 토큰 json 파일로 저장 시 동작한다. 단기 토큰을 장기 토큰으로 교환할 수 있는 코드가 구현되어 있으므로, 단기 토큰을 장기 토큰으로 교환 후 사용할 것을 권한다. 
+This repository is for Facebook page crawlers. The Facebook crawler is based on Facebook Graph API 4.0. It can be execute by run the Web UI based on flask at a local server. The page URL is entered, crawls on the latest 100 posts on the page, and returns results in CSV (Changeable-post number and paging), which requires API tokens issued by the user directly registering the app, and works when saved as short-term and long-term token json files. Since code for exchanging short-term tokens for long-term tokens is implemented, it is recommended that short-term tokens be exchanged for long-term tokens before being used.
 
 ## Have to Prepare
 
