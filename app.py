@@ -1,12 +1,13 @@
 import flask
+from flask import Flask, render_template,request,send_from_directory,abort
 import json
 import os
 import requests_oauthlib
 from requests_oauthlib.compliance_fixes import facebook_compliance_fix
 import urllib.request
 import requests
-
-
+import fb_crawling
+from fb_token import *
 ###################################################################
 
 ### BASIC SETTING
@@ -28,10 +29,7 @@ app = flask.Flask(__name__)
 ### 사용자가 첫번째로 보는 페이지 - 장기토큰 발급, URL 입력 후 크롤링 개시
 @app.route("/")
 def index():
-    return """
-    <a href="/fb-login">Login for get token</a>
-    <a href="/fb-crawling">Do Crawling </a>
-    """
+    return render_template('index.html')
 
 ####################################################################
 ### Facebook session 로그인 후 토큰 교환 
@@ -93,50 +91,31 @@ def callback():
     print("app_token: ",app_token)
     
     return f"""
-    User information: <br>
-    Name: {name} <br>
-    Email: {email} <br>
-    img: <img src="{picture_url}"> <br>
-    <a href="/">Home</a>
-    <input id="submitbutton" type="submit" name="submitbutton" value="run"/>
+    TOKEN REFRESHED, 
 	
     """
     
-@app.route("/fb-crawling")
+@app.route("/fb-crawling",methods=['POST'])
 def crawling():
     
-    #크롤링 함수 매개변수 
-    # [ page_id(str) , post_type(str), post_text(str), post_shares(int), post_comments(int), post_reaction_total, LIKE,LOVE,...]
-    # page-id -> post_id, post_txt, post_type, total_reactions
-
-    # post-id ->  shares, post_comments,
-    # 
-    # post - reactions
-    # ?fields=attachments,reactions.summary(total_count)
-    # 124691830975231/posts?fields=comments.summary(total_count),shares,reaction.summary(total_count)
-
-    long_token = get_long_token()
-
+    full_URL = request.form['url']
     
-    ## 컨텐츠 확인
-    data = requests.get(f"https://graph.facebook.com/v4.0/JTBClove/posts/?access_token={long_token}")
-    total = requests.get(f"https://graph.facebook.com/v4.0/124691830975231/posts?limit=10&fields=reactions.summary(total_count)")
-    print(data.json())
-    data = data.json()
-    for i in range(10):
-        print("#####",data["data"][i]["message"])
-        ## 작성 시간
-        print("#####",data["data"][i]["created_time"])
-        id = data["data"][i]["id"]
-        print(total.json()["data"])
+    ##URL 분해
+    page_name = full_URL.split('facebook')[1].split('/')[1]
 
+    ## 크롤러 객체 생성 및 실행
+    crawler = fb_crawling.Facebook_Crawler(page_name)
+    crawler.start()
     
-select_one('#list_subject_7854731 > font.mobile_hide')
-        
+    ## 파일 클라이언트로 전송
+    filename = page_name + '.csv'
+    try:
+        return send_from_directory('./', filename=filename, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
+    
+    return flask.redirect('/')
 
-    return """
-    THANKS.
-    """
 
 if __name__ == "__main__":
     app.run(debug=True)

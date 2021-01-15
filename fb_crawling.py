@@ -5,8 +5,8 @@ import csv
 from fb_token import *
 
 ####### v1.0 FACEBOOK GRAPH API BASED FACEBOOK PUBLIC PAGE CRAWLER
-#######  
-#######
+####### developer : receiver@kakao.com 
+####### MIT license
 class Facebook_Crawler(object):
 
     def __init__(self,id):
@@ -166,6 +166,7 @@ class Facebook_Crawler(object):
         
 
 if __name__ == "__main__":
-    facebook_crawler = Facebook_Crawler("dataMKTkorea")
+    page_name = input()
+    facebook_crawler = Facebook_Crawler(page_name)
     facebook_crawler.page_limit = 50
     facebook_crawler.start()
